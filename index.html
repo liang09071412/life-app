@@ -1021,19 +1021,31 @@ function initCloudBase(){
 }
 
 async function loadFromCloud(){
-  if(!db) return null;
+  if(!db) {console.warn('[CloudBase] db not initialized, skip load'); return null;}
   try{
     const res = await db.collection('lifeos_data').doc('main').get();
+    console.log('[CloudBase] load result:', res);
     if(res.data && res.data.length > 0) return res.data[0].data;
+    if(res.data && !Array.isArray(res.data)) return res.data.data; // fallback for different SDK versions
+    console.log('[CloudBase] no data found in cloud');
     return null;
-  }catch(e){return null}
+  }catch(e){console.error('[CloudBase] load failed:', e); return null;}
 }
 
 async function saveToCloud(data){
-  if(!db) return;
+  if(!db) {console.warn('[CloudBase] db not initialized, skip save'); return;}
   try{
-    await db.collection('lifeos_data').doc('main').set({data, updatedAt: new Date().toISOString()});
-  }catch(e){console.warn('CloudBase save failed:', e)}
+    const col = db.collection('lifeos_data');
+    const doc = col.doc('main');
+    // Try update first (doc must exist), then create if not found
+    try {
+      await doc.update({data, updatedAt: new Date().toISOString()});
+      console.log('[CloudBase] update ok');
+    } catch(e) {
+      await doc.set({data, updatedAt: new Date().toISOString()});
+      console.log('[CloudBase] set ok (created doc)');
+    }
+  }catch(e){console.error('[CloudBase] save failed:', e)}
 }
 
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
@@ -1481,7 +1493,7 @@ const app=createApp({
     function goToResult(r){r.action();searchQuery.value='';showSearch.value=false}
 
     // Storage
-    function persist(){
+    async function persist(){
       const dataObj={
         fitnessLogs:toRaw(fitnessLogs.value),
         wardrobe:toRaw(wardrobe.value),
@@ -1494,7 +1506,7 @@ const app=createApp({
         customColor:customColor.value,
       };
       saveData(dataObj);
-      saveToCloud(dataObj);
+      await saveToCloud(dataObj);
     }
     function exportData(){
       const data=JSON.stringify({
