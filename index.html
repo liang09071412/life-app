@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LYH Life</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+<style>
+/* ===== RESET ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.6;overflow:hidden;height:100vh}
+button{cursor:pointer;font:inherit;border:none;background:none}
+input,textarea,select{font:inherit;border:none;outline:none}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+ul,ol{list-style:none}
+
+/* ===== THEMES ===== */
+:root,[data-theme="dark"]{
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#252525;--bg4:#333;
+  --text:#e8e8e8;--text2:#aaa;--text3:#666;
+  --primary:#6c5ce7;--primary2:#a29bfe;--primary-bg:rgba(108,92,231,.12);
+  --accent:#00cec9;--accent2:#81ecec;
+  --danger:#ff6b6b;--warning:#feca57;--success:#55efc4;
+  --border:#2a2a2a;--shadow:0 4px 24px rgba(0,0,0,.4);
+  --radius:12px;--radius-sm:8px;--radius-xs:4px;
+}
+[data-theme="light"]{
+  --bg:#f5f5f7;--bg2:#fff;--bg3:#f0f0f2;--bg4:#e8e8ea;
+  --text:#1d1d1f;--text2:#6e6e73;--text3:#aeaeb2;
+  --primary:#6c5ce7;--primary2:#7c6cf7;--primary-bg:rgba(108,92,231,.08);
+  --accent:#00b894;--accent2:#55efc4;
+  --danger:#ff6b6b;--warning:#fdcb6e;--success:#00b894;
+  --border:#e0e0e0;--shadow:0 2px 12px rgba(0,0,0,.08);
+}
+[data-theme="warm"]{
+  --bg:#1a1512;--bg2:#231e19;--bg3:#2d2620;--bg4:#3d342c;
+  --text:#e8dfd4;--text2:#a89888;--text3:#6e5e4e;
+  --primary:#e17055;--primary2:#fab1a0;--primary-bg:rgba(225,112,85,.12);
+  --accent:#fdcb6e;--accent2:#ffeaa7;
+  --danger:#ff6b6b;--warning:#fdcb6e;--success:#55efc4;
+  --border:#3d342c;--shadow:0 4px 24px rgba(0,0,0,.5);
+}
+[data-theme="ocean"]{
+  --bg:#0a1628;--bg2:#0f1f3d;--bg3:#152a4a;--bg4:#1e3a5f;
+  --text:#c8daf0;--text2:#7a9cc6;--text3:#4a6a8f;
+  --primary:#0984e3;--primary2:#74b9ff;--primary-bg:rgba(9,132,227,.12);
+  --accent:#00cec9;--accent2:#81ecec;
+  --danger:#ff6b6b;--warning:#fdcb6e;--success:#55efc4;
+  --border:#1e3a5f;--shadow:0 4px 24px rgba(0,0,0,.5);
+}
+[data-theme="forest"]{
+  --bg:#0d1a0d;--bg2:#142114;--bg3:#1a2d1a;--bg4:#243d24;
+  --text:#d4e8d4;--text2:#8ab88a;--text3:#4a7a4a;
+  --primary:#00b894;--primary2:#55efc4;--primary-bg:rgba(0,184,148,.12);
+  --accent:#fdcb6e;--accent2:#ffeaa7;
+  --danger:#ff6b6b;--warning:#fdcb6e;--success:#55efc4;
+  --border:#243d24;--shadow:0 4px 24px rgba(0,0,0,.5);
+}
+
+/* ===== LAYOUT ===== */
+body{background:var(--bg);color:var(--text);display:flex;height:100vh}
+#app{display:flex;width:100%;height:100%}
+.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;z-index:10}
+.main{flex:1;overflow-y:auto;overflow-x:hidden;padding:24px 32px}
+.main::-webkit-scrollbar{width:6px}
+.main::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+
+/* SIDEBAR */
+.sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
+.sidebar-header h1{font-size:1.3rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.sidebar-header h1 span{font-size:1.5rem}
+.sidebar-header p{font-size:.75rem;color:var(--text2);margin-top:2px}
+.nav-list{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);font-size:.9rem;color:var(--text2);transition:all .2s}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--primary-bg);color:var(--primary);font-weight:600}
+.nav-item .icon{font-size:1.1rem;width:24px;text-align:center}
+.nav-spacer{flex:1}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap}
+.theme-dot{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.theme-dot:hover,.theme-dot.active{border-color:var(--text);transform:scale(1.15)}
+
+/* PAGE HEADER */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.page-title{font-size:1.5rem;font-weight:700}
+.page-subtitle{color:var(--text2);font-size:.85rem}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card-title{font-size:1rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-size:.85rem;font-weight:500;transition:all .2s}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{filter:brightness(1.15)}
+.btn-secondary{background:var(--bg3);color:var(--text)}
+.btn-secondary:hover{background:var(--bg4)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{filter:brightness(1.15)}
+.btn-ghost{color:var(--text2);padding:6px 10px}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-sm{padding:5px 10px;font-size:.8rem}
+.btn-icon{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--radius-xs)}
+
+/* INPUTS */
+.input,.textarea,.select{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text);width:100%;transition:border-color .2s}
+.input:focus,.textarea:focus,.select:focus{border-color:var(--primary)}
+.textarea{resize:vertical;min-height:80px}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:4px;font-weight:500}
+.form-row{display:flex;gap:12px}
+.form-row>*{flex:1}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);width:90%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1}
+.modal-header h3{font-size:1.05rem;font-weight:600}
+.modal-body{padding:20px}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* TAGS */
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:.75rem;font-weight:500;gap:4px}
+.tag-primary{background:var(--primary-bg);color:var(--primary)}
+.tag-success{background:rgba(85,239,196,.12);color:var(--success)}
+.tag-warning{background:rgba(253,203,110,.12);color:var(--warning)}
+.tag-danger{background:rgba(255,107,107,.12);color:var(--danger)}
+.tag-default{background:var(--bg3);color:var(--text2)}
+
+/* GRID */
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:900px){.grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.sidebar{width:60px}.sidebar .nav-text,.sidebar-header p,.sidebar-footer{display:none}.sidebar-header h1 span:last-child{display:none}.nav-item{justify-content:center;padding:10px}.nav-item .icon{margin:0}.main{padding:16px}}
+
+/* ===== DASHBOARD ===== */
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+@media(max-width:800px){.dash-stats{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.stat-value{font-size:1.8rem;font-weight:700;color:var(--primary)}
+.stat-label{font-size:.75rem;color:var(--text2);margin-top:2px}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.dash-grid{grid-template-columns:1fr}}
+
+/* ===== CALENDAR ===== */
+.calendar{width:100%}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-header h3{font-size:1rem;font-weight:600}
+.cal-nav{display:flex;gap:4px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-weekday{font-size:.7rem;color:var(--text3);text-align:center;padding:6px 0;font-weight:600}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--radius-xs);cursor:pointer;font-size:.85rem;position:relative;transition:all .15s;gap:2px}
+.cal-day:hover{background:var(--bg3)}
+.cal-day.today{font-weight:700;color:var(--primary)}
+.cal-day.selected{background:var(--primary);color:#fff}
+.cal-day.other-month{color:var(--text3);opacity:.4}
+.cal-day .dots{display:flex;gap:2px;position:absolute;bottom:3px}
+.cal-day .dot{width:4px;height:4px;border-radius:50%;background:var(--primary)}
+.cal-day.has-weight .dot{background:var(--accent)}
+
+/* ===== WARDROBE ===== */
+.clothes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.clothe-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .2s}
+.clothe-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.clothe-img{width:100%;aspect-ratio:3/4;object-fit:cover;background:var(--bg3)}
+.clothe-info{padding:10px}
+.clothe-name{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clothe-meta{font-size:.75rem;color:var(--text2);margin-top:2px}
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{padding:5px 12px;border-radius:20px;font-size:.8rem;background:var(--bg3);color:var(--text2);transition:all .2s}
+.filter-btn:hover,.filter-btn.active{background:var(--primary-bg);color:var(--primary)}
+
+/* ===== TRAVEL ===== */
+.trip-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;transition:all .2s}
+.trip-card:hover{box-shadow:var(--shadow)}
+.trip-header{display:flex;align-items:center;justify-content:space-between}
+.trip-title{font-size:1.05rem;font-weight:600}
+.trip-dates{font-size:.8rem;color:var(--text2)}
+.trip-desc{font-size:.85rem;color:var(--text2);margin-top:6px}
+.trip-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:map}
+.wishlist-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}
+.wishlist-icon{font-size:1.5rem}
+.wishlist-text{flex:1}
+.wishlist-name{font-weight:600;font-size:.9rem}
+.wishlist-note{font-size:.8rem;color:var(--text2)}
+
+/* ===== DIARY ===== */
+.diary-list{display:flex;flex-direction:column;gap:12px}
+.diary-entry{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s}
+.diary-entry:hover{box-shadow:var(--shadow)}
+.diary-date{font-size:.75rem;color:var(--text3);display:flex;align-items:center;gap:8px}
+.diary-title{font-size:1rem;font-weight:600;margin:4px 0}
+.diary-preview{font-size:.85rem;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.diary-tags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.diary-weather{font-size:1rem}
+
+/* ===== WEIGHT CHART ===== */
+.chart-container{width:100%;height:200px;position:relative;margin-top:12px}
+.chart-canvas{width:100%;height:100%}
+
+/* ===== SEARCH BAR ===== */
+.search-bar{position:relative}
+.search-bar input{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:8px 16px 8px 36px;width:240px;color:var(--text);font-size:.85rem;transition:all .2s}
+.search-bar input:focus{border-color:var(--primary);width:320px}
+.search-bar .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.85rem}
+.search-results{position:absolute;top:100%;left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-top:4px;max-height:300px;overflow-y:auto;z-index:50;box-shadow:var(--shadow)}
+.search-result-item{padding:10px 14px;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.search-result-item:hover{background:var(--bg3)}
+.search-result-item:last-child{border-bottom:none}
+.search-module{font-size:.7rem;color:var(--primary);font-weight:600}
+
+/* ===== PASSWORD GATE ===== */
+.gate{text-align:center;padding:60px 20px}
+.gate-icon{font-size:3rem;margin-bottom:16px}
+.gate h2{margin-bottom:8px}
+.gate p{color:var(--text2);margin-bottom:24px;font-size:.9rem}
+.gate input{text-align:center;font-size:1.2rem;letter-spacing:8px;width:200px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;color:var(--text)}
+
+/* ===== EMPTY STATE ===== */
+.empty{text-align:center;padding:40px 20px;color:var(--text2)}
+.empty-icon{font-size:2.5rem;margin-bottom:12px;opacity:.5}
+.empty p{font-size:.9rem;margin-bottom:16px}
+
+/* ===== TRANSITIONS ===== */
+.fade-enter-active,.fade-leave-active{transition:opacity .2s}
+.fade-enter-from,.fade-leave-to{opacity:0}
+.slide-enter-active,.slide-leave-active{transition:all .25s}
+.slide-enter-from{opacity:0;transform:translateY(10px)}
+.slide-leave-to{opacity:0;transform:translateY(-10px)}
+
+/* ===== TODAY OUTFIT ===== */
+.today-outfit{display:flex;gap:12px;align-items:center;padding:12px;background:var(--bg);border-radius:var(--radius-sm);margin-top:8px}
+.today-outfit-img{width:60px;height:80px;border-radius:var(--radius-xs);object-fit:cover;background:var(--bg3)}
+
+/* ===== MISC ===== */
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-8{gap:8px}.gap-12{gap:12px}.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mb-16{margin-bottom:16px}.mb-8{margin-bottom:8px}.text-center{text-align:center}.text-sm{font-size:.85rem}.text-xs{font-size:.75rem}.text-muted{color:var(--text2)}.font-bold{font-weight:700}.w-full{width:100%}
+.hidden{display:none}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.close-btn{font-size:1.2rem;color:var(--text2);padding:4px}
+.close-btn:hover{color:var(--text)}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1><span>🧬</span> <span>LYH Life</span></h1>
+      <p>{{ greeting }}</p>
+    </div>
+    <nav class="nav-list">
+      <button class="nav-item" :class="{active:currentView==='dashboard'}" @click="navigate('dashboard')">
+        <span class="icon">📊</span><span class="nav-text">仪表盘</span>
+      </button>
+      <button class="nav-item" :class="{active:currentView==='fitness'}" @click="navigate('fitness')">
+        <span class="icon">🏋️</span><span class="nav-text">健身计划</span>
+      </button>
+      <button class="nav-item" :class="{active:currentView==='wardrobe'}" @click="navigate('wardrobe')">
+        <span class="icon">👔</span><span class="nav-text">衣柜穿搭</span>
+      </button>
+      <button class="nav-item" :class="{active:currentView==='travel'}" @click="navigate('travel')">
+        <span class="icon">✈️</span><span class="nav-text">出行旅游</span>
+      </button>
+      <button class="nav-item" :class="{active:currentView==='diary'}" @click="navigate('diary')">
+        <span class="icon">📔</span><span class="nav-text">私密日记</span>
+      </button>
+      <div class="nav-spacer"></div>
+      <button class="nav-item" :class="{active:currentView==='settings'}" @click="navigate('settings')">
+        <span class="icon">⚙️</span><span class="nav-text">设置</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div v-for="t in themes" :key="t.name"
+           class="theme-dot" :class="{active:theme===t.name}"
+           :style="{background:t.color}" :title="t.label"
+           @click="setTheme(t.name)"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- SEARCH BAR (global) -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;gap:12px;align-items:center">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input v-model="searchQuery" placeholder="搜索所有内容..." @focus="showSearch=true" @blur="setTimeout(()=>showSearch=false,200)">
+        <div class="search-results" v-if="showSearch && searchQuery.length>0">
+          <div v-if="searchResults.length===0" style="padding:16px;text-align:center;color:var(--text3)">无结果</div>
+          <div class="search-result-item" v-for="r in searchResults" :key="r.id" @mousedown.prevent="goToResult(r)">
+            <span class="search-module">{{r.module}}</span>
+            <span>{{r.title}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <div v-if="currentView==='dashboard'">
+      <div class="page-header">
+        <div>
+          <div class="page-title">👋 你好，今天是 {{ formatDate(today) }}</div>
+          <div class="page-subtitle">{{ weekDay }}</div>
+        </div>
+      </div>
+      <div class="dash-stats">
+        <div class="stat-card">
+          <div class="stat-value">{{ fitnessLogs.length }}</div>
+          <div class="stat-label">累计训练天数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ wardrobe.length }}</div>
+          <div class="stat-label">衣物总数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ trips.length }}</div>
+          <div class="stat-label">旅行计划</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ diaryEntries.length }}</div>
+          <div class="stat-label">日记篇数</div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <!-- Today Fitness -->
+        <div class="card">
+          <div class="card-title">🏋️ 今日训练</div>
+          <div v-if="todayFitness">
+            <div v-for="(w,i) in todayFitness.workouts" :key="i" class="mb-8">
+              <span class="tag tag-primary">{{w.type}}</span>
+              <span class="text-sm" style="margin-left:8px">{{w.content}} {{w.duration?w.duration+'分钟':''}}</span>
+            </div>
+            <div v-if="todayFitness.weight" class="text-sm text-muted mt-8">体重: {{todayFitness.weight}}kg</div>
+          </div>
+          <div v-else class="empty" style="padding:16px">
+            <p class="text-sm">今天还没有记录</p>
+            <button class="btn btn-primary btn-sm mt-8" @click="openFitnessModal(today)">去记录</button>
+          </div>
+        </div>
+        <!-- Today Outfit -->
+        <div class="card">
+          <div class="card-title">👔 今日穿搭</div>
+          <div v-if="todayOutfit">
+            <div class="today-outfit" v-for="item in todayOutfitItems" :key="item.id">
+              <img v-if="item.image" :src="item.image" class="today-outfit-img">
+              <div v-else class="today-outfit-img" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">{{getCategoryIcon(item.category)}}</div>
+              <div>
+                <div class="text-sm font-bold">{{item.name}}</div>
+                <div class="text-xs text-muted">{{item.brand||''}} {{item.size||''}}</div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="empty" style="padding:16px">
+            <p class="text-sm">今天还没选穿搭</p>
+            <button class="btn btn-primary btn-sm mt-8" @click="navigate('wardrobe')">去选择</button>
+          </div>
+        </div>
+        <!-- Recent Diary -->
+        <div class="card">
+          <div class="card-title">📔 最近日记</div>
+          <div v-if="recentDiary.length">
+            <div v-for="d in recentDiary" :key="d.id" class="mb-8" style="cursor:pointer" @click="viewDiary(d)">
+              <div class="text-xs text-muted">{{formatDate(d.date)}} {{d.weather}}</div>
+              <div class="text-sm font-bold">{{d.title}}</div>
+            </div>
+          </div>
+          <div v-else class="empty" style="padding:16px"><p class="text-sm">还没有日记</p></div>
+        </div>
+        <!-- Weight Trend -->
+        <div class="card">
+          <div class="card-title">📈 体重趋势</div>
+          <div class="chart-container">
+            <canvas ref="weightChart" class="chart-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FITNESS ===== -->
+    <div v-if="currentView==='fitness'">
+      <div class="page-header">
+        <div class="page-title">🏋️ 健身运动计划</div>
+        <button class="btn btn-primary" @click="openFitnessModal(selectedDate)">+ 记录训练</button>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="calendar">
+            <div class="cal-header">
+              <button class="btn btn-ghost btn-sm" @click="changeMonth(-1)">◀</button>
+              <h3>{{ calYear }}年 {{ calMonth+1 }}月</h3>
+              <button class="btn btn-ghost btn-sm" @click="changeMonth(1)">▶</button>
+            </div>
+            <div class="cal-grid">
+              <div class="cal-weekday" v-for="d in weekdays" :key="d">{{d}}</div>
+              <div v-for="(day,i) in calendarDays" :key="i"
+                   class="cal-day" :class="{'other-month':!day.current, today:day.isToday, selected:day.date===selectedDate, 'has-workout':day.hasWorkout, 'has-weight':day.hasWeight}"
+                   @click="day.current && selectDate(day.date)">
+                <span>{{day.num}}</span>
+                <div class="dots" v-if="day.hasWorkout||day.hasWeight">
+                  <span class="dot" v-if="day.hasWorkout"></span>
+                  <span class="dot" v-if="day.hasWeight" style="background:var(--accent)"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card mb-16">
+            <div class="card-title">📋 {{ formatDate(selectedDate) }} 训练记录</div>
+            <div v-if="selectedFitness">
+              <div v-if="selectedFitness.weight" class="mb-8">
+                <span class="tag tag-success">体重 {{selectedFitness.weight}}kg</span>
+              </div>
+              <div v-for="(w,i) in selectedFitness.workouts" :key="i" style="padding:8px 0;border-bottom:1px solid var(--border)">
+                <span class="tag tag-primary">{{w.type}}</span>
+                <div class="text-sm mt-8">{{w.content}}</div>
+                <div class="text-xs text-muted" v-if="w.duration">时长: {{w.duration}}分钟</div>
+                <div class="text-xs text-muted" v-if="w.notes">{{w.notes}}</div>
+              </div>
+              <div class="mt-8" style="display:flex;gap:8px">
+                <button class="btn btn-secondary btn-sm" @click="openFitnessModal(selectedDate)">编辑</button>
+                <button class="btn btn-danger btn-sm" @click="deleteFitness(selectedDate)">删除</button>
+              </div>
+            </div>
+            <div v-else class="empty" style="padding:20px">
+              <p class="text-sm">这天没有训练记录</p>
+              <button class="btn btn-primary btn-sm mt-8" @click="openFitnessModal(selectedDate)">添加记录</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">📈 体重变化</div>
+            <div class="chart-container">
+              <canvas ref="fitnessWeightChart" class="chart-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== WARDROBE ===== -->
+    <div v-if="currentView==='wardrobe'">
+      <div class="page-header">
+        <div class="page-title">👔 衣柜穿搭</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" @click="showOutfitHistory=!showOutfitHistory">📅 穿搭记录</button>
+          <button class="btn btn-primary" @click="openClotheModal()">+ 添加衣物</button>
+        </div>
+      </div>
+      <!-- Today outfit selector -->
+      <div class="card mb-16">
+        <div class="card-title">🎯 今日穿搭 · {{formatDate(today)}}</div>
+        <div v-if="todayOutfitItems.length" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+          <div v-for="item in todayOutfitItems" :key="item.id" class="tag tag-primary" style="padding:4px 10px">
+            {{item.name}} <span style="cursor:pointer;margin-left:4px" @click="removeFromOutfit(item.id)">✕</span>
+          </div>
+        </div>
+        <p v-else class="text-sm text-muted mb-8">点击下方衣物卡片添加到今日穿搭</p>
+        <button v-if="todayOutfitItems.length" class="btn btn-danger btn-sm" @click="clearTodayOutfit">清空今日穿搭</button>
+      </div>
+      <!-- Filters -->
+      <div class="filter-bar">
+        <button class="filter-btn" :class="{active:clotheFilter==='all'}" @click="clotheFilter='all'">全部</button>
+        <button class="filter-btn" :class="{active:clotheFilter===c}" v-for="c in clotheCategories" :key="c" @click="clotheFilter=c">
+          {{getCategoryIcon(c)}} {{c}}
+        </button>
+      </div>
+      <!-- Clothes Grid -->
+      <div class="clothes-grid" v-if="filteredClothes.length">
+        <div class="clothe-card" v-for="c in filteredClothes" :key="c.id" @click="toggleOutfitItem(c)">
+          <img v-if="c.image" :src="c.image" class="clothe-img">
+          <div v-else class="clothe-img" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem">{{getCategoryIcon(c.category)}}</div>
+          <div class="clothe-info">
+            <div class="clothe-name">{{c.name}}</div>
+            <div class="clothe-meta">{{c.brand||''}} · {{c.size||''}} · {{c.color||''}}</div>
+            <div class="clothe-meta">穿了 {{c.wearCount||0}} 次</div>
+          </div>
+        </div>
+      </div>
+      <div v-else class="empty">
+        <div class="empty-icon">👔</div>
+        <p>衣柜空空如也，添加第一件衣物吧</p>
+        <button class="btn btn-primary" @click="openClotheModal()">+ 添加衣物</button>
+      </div>
+      <!-- Outfit History Modal -->
+      <div class="modal-overlay" v-if="showOutfitHistory" @click.self="showOutfitHistory=false">
+        <div class="modal">
+          <div class="modal-header">
+            <h3>📅 穿搭历史</h3>
+            <button class="close-btn" @click="showOutfitHistory=false">✕</button>
+          </div>
+          <div class="modal-body">
+            <div v-if="Object.keys(outfitHistory).length===0" class="empty"><p>还没有穿搭记录</p></div>
+            <div v-for="(items,date) in sortedOutfitHistory" :key="date" class="mb-16">
+              <div class="font-bold text-sm mb-8">{{formatDate(date)}}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <span class="tag tag-default" v-for="id in items" :key="id">{{getClotheName(id)}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TRAVEL ===== -->
+    <div v-if="currentView==='travel'">
+      <div class="page-header">
+        <div class="page-title">✈️ 出行旅游</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" :class="{active:travelTab==='trips'}" @click="travelTab='trips'">旅行计划</button>
+          <button class="btn btn-secondary" :class="{active:travelTab==='wishlist'}" @click="travelTab='wishlist'">心愿清单</button>
+          <button class="btn btn-primary" @click="travelTab==='trips'?openTripModal():openWishModal()">+ 添加</button>
+        </div>
+      </div>
+      <!-- Trips -->
+      <div v-if="travelTab==='trips'">
+        <div v-if="trips.length===0" class="empty">
+          <div class="empty-icon">🗺️</div>
+          <p>还没有旅行计划，添加一个吧</p>
+        </div>
+        <div class="trip-card" v-for="trip in trips" :key="trip.id">
+          <div class="trip-header">
+            <div class="trip-title">{{trip.destination}}</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-sm" @click="openTripModal(trip)">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger)" @click="deleteTrip(trip.id)">删除</button>
+            </div>
+          </div>
+          <div class="trip-dates" v-if="trip.startDate">{{formatDate(trip.startDate)}} ~ {{formatDate(trip.endDate)}}</div>
+          <div class="trip-desc" v-if="trip.notes">{{trip.notes}}</div>
+          <!-- Itinerary -->
+          <div v-if="trip.itinerary&&trip.itinerary.length" class="mt-8">
+            <div class="text-sm font-bold mb-8">📋 行程安排</div>
+            <div v-for="(day,i) in trip.itinerary" :key="i" style="padding:6px 0;border-bottom:1px solid var(--border)">
+              <span class="tag tag-primary">{{day.date||('Day '+(i+1))}}</span>
+              <span class="text-sm" style="margin-left:8px">{{day.activities}}</span>
+              <div class="text-xs text-muted mt-8" v-if="day.hotel">🏨 {{day.hotel}}</div>
+              <div class="text-xs text-muted" v-if="day.food">🍽️ {{day.food}}</div>
+            </div>
+          </div>
+          <!-- Photos -->
+          <div v-if="trip.photos&&trip.photos.length" class="mt-8" style="display:flex;gap:8px;flex-wrap:wrap">
+            <img v-for="(p,j) in trip.photos" :key="j" :src="p" style="width:80px;height:80px;object-fit:cover;border-radius:var(--radius-xs)">
+          </div>
+          <!-- Budget -->
+          <div v-if="trip.budget" class="mt-8">
+            <span class="tag tag-warning">预算 ¥{{trip.budget}}</span>
+          </div>
+        </div>
+      </div>
+      <!-- Wishlist -->
+      <div v-if="travelTab==='wishlist'">
+        <div v-if="wishlist.length===0" class="empty">
+          <div class="empty-icon">🌟</div>
+          <p>心愿清单为空</p>
+        </div>
+        <div class="wishlist-item" v-for="w in wishlist" :key="w.id">
+          <div class="wishlist-icon">{{w.icon||'📍'}}</div>
+          <div class="wishlist-text">
+            <div class="wishlist-name">{{w.name}}</div>
+            <div class="wishlist-note" v-if="w.note">{{w.note}}</div>
+          </div>
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-ghost btn-sm" @click="promoteToTrip(w)">→ 计划</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--danger)" @click="deleteWish(w.id)">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DIARY ===== -->
+    <div v-if="currentView==='diary'">
+      <!-- Password Gate -->
+      <div v-if="!diaryUnlocked" class="gate">
+        <div class="gate-icon">🔒</div>
+        <h2>私密日记</h2>
+        <p>请输入密码解锁</p>
+        <input type="password" v-model="diaryPwInput" @keyup.enter="unlockDiary" placeholder="••••">
+        <div class="mt-16">
+          <button class="btn btn-primary" @click="unlockDiary">解锁</button>
+        </div>
+        <p class="text-xs text-muted mt-8" v-if="diaryPwError" style="color:var(--danger)">密码错误</p>
+        <p class="text-xs text-muted mt-8">默认密码: 1234（可在设置中修改）</p>
+      </div>
+      <!-- Diary Content -->
+      <div v-else>
+        <div class="page-header">
+          <div class="page-title">📔 私密日记</div>
+          <button class="btn btn-primary" @click="openDiaryModal()">+ 写日记</button>
+        </div>
+        <!-- Tag filter -->
+        <div class="filter-bar mb-16">
+          <button class="filter-btn" :class="{active:diaryTagFilter==='all'}" @click="diaryTagFilter='all'">全部</button>
+          <button class="filter-btn" :class="{active:diaryTagFilter===t}" v-for="t in allDiaryTags" :key="t" @click="diaryTagFilter=t">{{t}}</button>
+        </div>
+        <div class="diary-list" v-if="filteredDiary.length">
+          <div class="diary-entry" v-for="d in filteredDiary" :key="d.id" @click="viewDiary(d)">
+            <div class="diary-date">
+              <span>{{formatDate(d.date)}} {{formatTime(d.date)}}</span>
+              <span class="diary-weather">{{d.weather}}</span>
+            </div>
+            <div class="diary-title">{{d.title}}</div>
+            <div class="diary-preview">{{d.content}}</div>
+            <div class="diary-tags" v-if="d.tags&&d.tags.length">
+              <span class="tag tag-default" v-for="t in d.tags" :key="t">{{t}}</span>
+            </div>
+            <div v-if="d.photos&&d.photos.length" class="mt-8" style="display:flex;gap:6px">
+              <img v-for="(p,i) in d.photos.slice(0,3)" :key="i" :src="p" style="width:60px;height:60px;object-fit:cover;border-radius:var(--radius-xs)">
+              <span v-if="d.photos.length>3" class="tag tag-default">+{{d.photos.length-3}}</span>
+            </div>
+          </div>
+        </div>
+        <div v-else class="empty">
+          <div class="empty-icon">📝</div>
+          <p>还没有日记，写下今天的心情吧</p>
+          <button class="btn btn-primary" @click="openDiaryModal()">+ 写日记</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div v-if="currentView==='settings'">
+      <div class="page-header">
+        <div class="page-title">⚙️ 设置</div>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-title">🎨 主题设置</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div v-for="t in themes" :key="t.name" style="text-align:center;cursor:pointer" @click="setTheme(t.name)">
+              <div style="width:60px;height:40px;border-radius:var(--radius-sm);margin-bottom:4px" :style="{background:t.color,border:theme===t.name?'2px solid var(--text)':'2px solid transparent'}"></div>
+              <span class="text-xs">{{t.label}}</span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="form-group">
+            <label class="form-label">自定义主色调</label>
+            <input type="color" :value="customColor" @input="applyCustomColor($event.target.value)" style="width:60px;height:32px;border:none;cursor:pointer">
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔒 安全设置</div>
+          <div class="form-group">
+            <label class="form-label">日记密码</label>
+            <div style="display:flex;gap:8px">
+              <input class="input" type="password" v-model="newPw" placeholder="输入新密码">
+              <button class="btn btn-primary btn-sm" @click="changeDiaryPw">修改</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">💾 数据管理</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-secondary" @click="exportData">📤 导出数据</button>
+            <button class="btn btn-secondary" @click="$refs.importFile.click()">📥 导入数据</button>
+            <input type="file" ref="importFile" accept=".json" @change="importData" style="display:none">
+          </div>
+          <p class="text-xs text-muted mt-8">数据保存在浏览器本地存储中，建议定期导出备份</p>
+        </div>
+        <div class="card">
+          <div class="card-title">📊 数据统计</div>
+          <div class="text-sm">
+            <p>健身记录: {{fitnessLogs.length}} 天</p>
+            <p>衣物数量: {{wardrobe.length}} 件</p>
+            <p>旅行计划: {{trips.length}} 个</p>
+            <p>心愿清单: {{wishlist.length}} 个</p>
+            <p>日记篇数: {{diaryEntries.length}} 篇</p>
+            <p class="text-muted mt-8">LocalStorage 使用: {{storageUsed}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== MODALS ===== -->
+  <!-- Fitness Modal -->
+  <div class="modal-overlay" v-if="showFitnessModal" @click.self="showFitnessModal=false">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>🏋️ 记录训练 · {{formatDate(fitnessForm.date)}}</h3>
+        <button class="close-btn" @click="showFitnessModal=false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">日期</label>
+          <input class="input" type="date" v-model="fitnessForm.date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">体重 (kg)</label>
+          <input class="input" type="number" step="0.1" v-model="fitnessForm.weight" placeholder="例如: 70.5">
+        </div>
+        <div class="divider"></div>
+        <div class="flex justify-between items-center mb-8">
+          <label class="form-label" style="margin:0">训练项目</label>
+          <button class="btn btn-primary btn-sm" @click="addWorkout">+ 添加</button>
+        </div>
+        <div v-for="(w,i) in fitnessForm.workouts" :key="i" style="padding:12px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:8px">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">类型</label>
+              <select class="select" v-model="w.type">
+                <option value="力量训练">💪 力量训练</option>
+                <option value="有氧运动">🏃 有氧运动</option>
+                <option value="跑步">🏃‍♂️ 跑步</option>
+                <option value="游泳">🏊 游泳</option>
+                <option value="骑行">🚴 骑行</option>
+                <option value="球类运动">⚽ 球类运动</option>
+                <option value="瑜伽">🧘 瑜伽</option>
+                <option value="拉伸">🤸 拉伸</option>
+                <option value="其他">📋 其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">时长(分钟)</label>
+              <input class="input" type="number" v-model="w.duration" placeholder="60">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">内容详情</label>
+            <textarea class="textarea" v-model="w.content" rows="2" placeholder="例如: 卧推 60kg 4组x10次"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <input class="input" v-model="w.notes" placeholder="状态如何？">
+          </div>
+          <button class="btn btn-danger btn-sm" @click="fitnessForm.workouts.splice(i,1)" v-if="fitnessForm.workouts.length>1">删除此项</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" @click="showFitnessModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveFitness">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clothe Modal -->
+  <div class="modal-overlay" v-if="showClotheModal" @click.self="showClotheModal=false">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>{{clotheForm.id?'编辑衣物':'👔 添加衣物'}}</h3>
+        <button class="close-btn" @click="showClotheModal=false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">照片</label>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:80px;height:100px;background:var(--bg);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;overflow:hidden">
+              <img v-if="clotheForm.image" :src="clotheForm.image" style="width:100%;height:100%;object-fit:cover">
+              <span v-else style="font-size:1.5rem;color:var(--text3)">📷</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" @click="$refs.clotheImageInput.click()">选择图片</button>
+            <input type="file" ref="clotheImageInput" accept="image/*" @change="handleClotheImage" style="display:none">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">名称 *</label>
+            <input class="input" v-model="clotheForm.name" placeholder="例如: 白色T恤">
+          </div>
+          <div class="form-group">
+            <label class="form-label">分类 *</label>
+            <select class="select" v-model="clotheForm.category">
+              <option v-for="c in clotheCategories" :key="c" :value="c">{{getCategoryIcon(c)}} {{c}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">品牌</label>
+            <input class="input" v-model="clotheForm.brand" placeholder="Nike, Uniqlo...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">尺码</label>
+            <input class="input" v-model="clotheForm.size" placeholder="M, L, 42...">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">颜色</label>
+            <input class="input" v-model="clotheForm.color" placeholder="白色, 黑色...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">季节</label>
+            <select class="select" v-model="clotheForm.season">
+              <option value="">不限</option>
+              <option value="春">🌸 春</option>
+              <option value="夏">☀️ 夏</option>
+              <option value="秋">🍂 秋</option>
+              <option value="冬">❄️ 冬</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <input class="input" v-model="clotheForm.notes" placeholder="材质、购入渠道等">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" @click="showClotheModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveClothe">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trip Modal -->
+  <div class="modal-overlay" v-if="showTripModal" @click.self="showTripModal=false">
+    <div class="modal" style="max-width:640px">
+      <div class="modal-header">
+        <h3>{{tripForm.id?'编辑旅行':'✈️ 新建旅行计划'}}</h3>
+        <button class="close-btn" @click="showTripModal=false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">目的地 *</label>
+          <input class="input" v-model="tripForm.destination" placeholder="例如: 日本东京">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">出发日期</label>
+            <input class="input" type="date" v-model="tripForm.startDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">返回日期</label>
+            <input class="input" type="date" v-model="tripForm.endDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">预算 (¥)</label>
+          <input class="input" type="number" v-model="tripForm.budget" placeholder="5000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <textarea class="textarea" v-model="tripForm.notes" rows="2" placeholder="旅行概要..."></textarea>
+        </div>
+        <div class="divider"></div>
+        <div class="flex justify-between items-center mb-8">
+          <label class="form-label" style="margin:0">📋 每日行程</label>
+          <button class="btn btn-primary btn-sm" @click="addItineraryDay">+ 添加一天</button>
+        </div>
+        <div v-for="(day,i) in tripForm.itinerary" :key="i" style="padding:12px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:8px">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">日期</label>
+              <input class="input" type="date" v-model="day.date">
+            </div>
+            <div style="display:flex;align-items:flex-end">
+              <button class="btn btn-danger btn-sm" @click="tripForm.itinerary.splice(i,1)">删除</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">活动安排</label>
+            <textarea class="textarea" v-model="day.activities" rows="2" placeholder="上午... 下午... 晚上..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">🏨 住宿</label>
+              <input class="input" v-model="day.hotel" placeholder="酒店名/民宿">
+            </div>
+            <div class="form-group">
+              <label class="form-label">🍽️ 美食</label>
+              <input class="input" v-model="day.food" placeholder="想吃什么">
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="form-group">
+          <label class="form-label">📸 照片</label>
+          <button class="btn btn-secondary btn-sm" @click="$refs.tripImageInput.click()">添加照片</button>
+          <input type="file" ref="tripImageInput" accept="image/*" multiple @change="handleTripImages" style="display:none">
+          <div v-if="tripForm.photos.length" class="mt-8" style="display:flex;gap:8px;flex-wrap:wrap">
+            <div v-for="(p,i) in tripForm.photos" :key="i" style="position:relative">
+              <img :src="p" style="width:80px;height:80px;object-fit:cover;border-radius:var(--radius-xs)">
+              <button style="position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center" @click="tripForm.photos.splice(i,1)">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" @click="showTripModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveTrip">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wish Modal -->
+  <div class="modal-overlay" v-if="showWishModal" @click.self="showWishModal=false">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-header">
+        <h3>🌟 添加心愿</h3>
+        <button class="close-btn" @click="showWishModal=false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">地点名称 *</label>
+          <input class="input" v-model="wishForm.name" placeholder="例如: 冰岛">
+        </div>
+        <div class="form-group">
+          <label class="form-label">图标</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button v-for="icon in wishIcons" :key="icon" class="btn btn-ghost btn-icon" :style="wishForm.icon===icon?'background:var(--primary-bg)':'' " @click="wishForm.icon=icon" style="font-size:1.2rem;width:36px;height:36px">{{icon}}</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <textarea class="textarea" v-model="wishForm.note" rows="2" placeholder="为什么想去？"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" @click="showWishModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveWish">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diary Modal -->
+  <div class="modal-overlay" v-if="showDiaryModal" @click.self="showDiaryModal=false">
+    <div class="modal" style="max-width:640px">
+      <div class="modal-header">
+        <h3>{{diaryForm.id?'编辑日记':'📔 写日记'}}</h3>
+        <button class="close-btn" @click="showDiaryModal=false">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">日期</label>
+            <input class="input" type="date" v-model="diaryForm.date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">天气</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button v-for="w in weatherOptions" :key="w" class="btn btn-ghost btn-sm" :style="diaryForm.weather===w?'background:var(--primary-bg)':'' " @click="diaryForm.weather=w" style="font-size:1.1rem">{{w}}</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">标题 *</label>
+          <input class="input" v-model="diaryForm.title" placeholder="今天的心情...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">内容 *</label>
+          <textarea class="textarea" v-model="diaryForm.content" rows="8" placeholder="写下你的心情..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">标签</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+            <button v-for="t in diaryPresets" :key="t" class="btn btn-ghost btn-sm" :style="diaryForm.tags.includes(t)?'background:var(--primary-bg);color:var(--primary)':'' " @click="toggleDiaryTag(t)">{{t}}</button>
+          </div>
+          <input class="input" v-model="newDiaryTag" placeholder="自定义标签，回车添加" @keyup.enter="addCustomDiaryTag">
+        </div>
+        <div class="form-group">
+          <label class="form-label">📸 照片</label>
+          <button class="btn btn-secondary btn-sm" @click="$refs.diaryImageInput.click()">添加照片</button>
+          <input type="file" ref="diaryImageInput" accept="image/*" multiple @change="handleDiaryImages" style="display:none">
+          <div v-if="diaryForm.photos.length" class="mt-8" style="display:flex;gap:8px;flex-wrap:wrap">
+            <div v-for="(p,i) in diaryForm.photos" :key="i" style="position:relative">
+              <img :src="p" style="width:80px;height:80px;object-fit:cover;border-radius:var(--radius-xs)">
+              <button style="position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center" @click="diaryForm.photos.splice(i,1)">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger btn-sm" v-if="diaryForm.id" @click="deleteDiary(diaryForm.id)">删除</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-secondary" @click="showDiaryModal=false">取消</button>
+        <button class="btn btn-primary" @click="saveDiary">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diary View Modal -->
+  <div class="modal-overlay" v-if="viewingDiary" @click.self="viewingDiary=null">
+    <div class="modal" style="max-width:640px">
+      <div class="modal-header">
+        <div>
+          <div class="diary-date">{{formatDate(viewingDiary.date)}} {{viewingDiary.weather}}</div>
+          <h3 style="margin-top:4px">{{viewingDiary.title}}</h3>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary btn-sm" @click="openDiaryModal(viewingDiary);viewingDiary=null">编辑</button>
+          <button class="close-btn" @click="viewingDiary=null">✕</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="diary-tags mb-16" v-if="viewingDiary.tags&&viewingDiary.tags.length">
+          <span class="tag tag-default" v-for="t in viewingDiary.tags" :key="t">{{t}}</span>
+        </div>
+        <div style="white-space:pre-wrap;line-height:1.8;font-size:.95rem">{{viewingDiary.content}}</div>
+        <div v-if="viewingDiary.photos&&viewingDiary.photos.length" class="mt-16" style="display:flex;gap:8px;flex-wrap:wrap">
+          <img v-for="(p,i) in viewingDiary.photos" :key="i" :src="p" style="max-width:200px;border-radius:var(--radius-sm);cursor:pointer" @click="openImageFull(p)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Image Overlay -->
+  <div class="modal-overlay" v-if="fullImage" @click="fullImage=null" style="z-index:200;cursor:zoom-out">
+    <img :src="fullImage" style="max-width:90vw;max-height:90vh;border-radius:var(--radius)">
+  </div>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+const {createApp,ref,computed,watch,onMounted,nextTick,reactive,toRaw} = Vue;
+
+const STORAGE_KEY = 'lifeos_data';
+const DEFAULT_PW = '1234';
+
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function todayStr(){const d=new Date();return d.toISOString().split('T')[0]}
+
+function loadData(){
+  try{const raw=localStorage.getItem(STORAGE_KEY);return raw?JSON.parse(raw):null}catch(e){return null}
+}
+function saveData(data){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}catch(e){
+    if(e.name==='QuotaExceededError')alert('存储空间不足！请删除一些图片或导出数据后清理。')
+  }
+}
+
+function compressImage(file,maxW=400,quality=0.7){
+  return new Promise((resolve)=>{
+    const reader=new FileReader();
+    reader.onload=(e)=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        let w=img.width,h=img.height;
+        if(w>maxW){h=h*maxW/w;w=maxW}
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+const app=createApp({
+  setup(){
+    // --- STATE ---
+    const currentView=ref('dashboard');
+    const theme=ref('dark');
+    const today=todayStr();
+    const searchQuery=ref('');
+    const showSearch=ref(false);
+
+    // Themes
+    const themes=[
+      {name:'dark',color:'#1a1a1a',label:'暗黑'},
+      {name:'light',color:'#e8e8ea',label:'明亮'},
+      {name:'warm',color:'#2d2620',label:'暖棕'},
+      {name:'ocean',color:'#0f1f3d',label:'海洋'},
+      {name:'forest',color:'#142114',label:'森林'},
+    ];
+    const customColor=ref('#6c5ce7');
+
+    // Data
+    const fitnessLogs=ref([]);
+    const wardrobe=ref([]);
+    const outfitHistory=ref({});
+    const trips=ref([]);
+    const wishlist=ref([]);
+    const diaryEntries=ref([]);
+    const diaryPassword=ref(DEFAULT_PW);
+
+    // Calendar
+    const calYear=ref(new Date().getFullYear());
+    const calMonth=ref(new Date().getMonth());
+    const selectedDate=ref(today);
+    const weekdays=['日','一','二','三','四','五','六'];
+
+    // Modals
+    const showFitnessModal=ref(false);
+    const showClotheModal=ref(false);
+    const showTripModal=ref(false);
+    const showWishModal=ref(false);
+    const showDiaryModal=ref(false);
+    const showOutfitHistory=ref(false);
+    const viewingDiary=ref(null);
+    const fullImage=ref(null);
+
+    // Forms
+    const fitnessForm=ref({date:today,weight:'',workouts:[{type:'力量训练',content:'',duration:'',notes:''}]});
+    const clotheForm=ref({id:null,name:'',category:'上装',brand:'',size:'',color:'',season:'',image:'',notes:''});
+    const tripForm=ref({id:null,destination:'',startDate:'',endDate:'',budget:'',notes:'',itinerary:[],photos:[]});
+    const wishForm=ref({id:null,name:'',icon:'📍',note:''});
+    const diaryForm=ref({id:null,date:today,title:'',content:'',weather:'☀️',tags:[],photos:[]});
+
+    // Wardrobe
+    const clotheFilter=ref('all');
+    const clotheCategories=['上装','下装','外套','鞋','配饰','内衣','运动装','正装'];
+
+    // Diary
+    const diaryUnlocked=ref(false);
+    const diaryPwInput=ref('');
+    const diaryPwError=ref(false);
+    const diaryTagFilter=ref('all');
+    const newDiaryTag=ref('');
+    const diaryPresets=['开心','难过','焦虑','平静','兴奋','疲惫','感恩','思考','工作','学习','运动','旅行','美食','社交','独处'];
+    const weatherOptions=['☀️','⛅','☁️','🌧️','⛈️','❄️','🌈','🌙'];
+    const wishIcons=['📍','🏔️','🏖️','🌆','🗼','🏛️','🌸','🎭','🛫','🌍','🗿','🎡','🌋','🏕️','⛩️'];
+
+    // Travel
+    const travelTab=ref('trips');
+
+    // --- COMPUTED ---
+    const greeting=computed(()=>{
+      const h=new Date().getHours();
+      if(h<6) return '🌙 夜深了';
+      if(h<12) return '☀️ 早上好';
+      if(h<14) return '🌤️ 中午好';
+      if(h<18) return '🌅 下午好';
+      return '🌆 晚上好';
+    });
+
+    const weekDay=computed(()=>{
+      const d=new Date(today);
+      const days=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+      return days[d.getDay()];
+    });
+
+    const todayFitness=computed(()=>fitnessLogs.value.find(f=>f.date===today));
+    const todayOutfit=computed(()=>outfitHistory.value[today]);
+    const todayOutfitItems=computed(()=>{
+      if(!todayOutfit.value) return [];
+      return todayOutfit.value.map(id=>wardrobe.value.find(w=>w.id===id)).filter(Boolean);
+    });
+    const recentDiary=computed(()=>[...diaryEntries.value].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5));
+
+    const calendarDays=computed(()=>{
+      const y=calYear.value,m=calMonth.value;
+      const firstDay=new Date(y,m,1).getDay();
+      const daysInMonth=new Date(y,m+1,0).getDate();
+      const daysInPrev=new Date(y,m,0).getDate();
+      const days=[];
+      for(let i=firstDay-1;i>=0;i--){
+        const num=daysInPrev-i;
+        const date=`${y}-${String(m).padStart(2,'0')}-${String(num).padStart(2,'0')}`;
+        days.push({num,date,current:false,isToday:false,hasWorkout:false,hasWeight:false});
+      }
+      for(let i=1;i<=daysInMonth;i++){
+        const date=`${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+        const log=fitnessLogs.value.find(f=>f.date===date);
+        days.push({num:i,date,current:true,isToday:date===today,hasWorkout:log&&log.workouts&&log.workouts.length>0,hasWeight:!!(log&&log.weight)});
+      }
+      const remaining=42-days.length;
+      for(let i=1;i<=remaining;i++){
+        const date=`${y}-${String(m+2).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+        days.push({num:i,date,current:false,isToday:false,hasWorkout:false,hasWeight:false});
+      }
+      return days;
+    });
+
+    const selectedFitness=computed(()=>fitnessLogs.value.find(f=>f.date===selectedDate.value));
+
+    const filteredClothes=computed(()=>{
+      if(clotheFilter.value==='all') return wardrobe.value;
+      return wardrobe.value.filter(c=>c.category===clotheFilter.value);
+    });
+
+    const sortedOutfitHistory=computed(()=>{
+      const sorted={};
+      Object.keys(outfitHistory.value).sort((a,b)=>b.localeCompare(a)).forEach(k=>{sorted[k]=outfitHistory.value[k]});
+      return sorted;
+    });
+
+    const allDiaryTags=computed(()=>{
+      const tags=new Set();
+      diaryEntries.value.forEach(d=>{if(d.tags)d.tags.forEach(t=>tags.add(t))});
+      return [...tags];
+    });
+
+    const filteredDiary=computed(()=>{
+      let list=[...diaryEntries.value].sort((a,b)=>b.date.localeCompare(a.date));
+      if(diaryTagFilter.value!=='all') list=list.filter(d=>d.tags&&d.tags.includes(diaryTagFilter.value));
+      return list;
+    });
+
+    const searchResults=computed(()=>{
+      if(!searchQuery.value) return [];
+      const q=searchQuery.value.toLowerCase();
+      const results=[];
+      fitnessLogs.value.forEach(f=>{
+        const match=f.date.includes(q)||(f.workouts&&f.workouts.some(w=>(w.content||'').toLowerCase().includes(q)));
+        if(match) results.push({id:'f'+f.date,module:'健身',title:f.date+(f.workouts&&f.workouts[0]?' · '+f.workouts[0].type:''),action:()=>{navigate('fitness');selectedDate.value=f.date}});
+      });
+      wardrobe.value.forEach(c=>{
+        if(c.name.toLowerCase().includes(q)||(c.brand&&c.brand.toLowerCase().includes(q)))
+          results.push({id:'w'+c.id,module:'衣柜',title:c.name,action:()=>navigate('wardrobe')});
+      });
+      trips.value.forEach(t=>{
+        if(t.destination.toLowerCase().includes(q))
+          results.push({id:'t'+t.id,module:'旅行',title:t.destination,action:()=>{navigate('travel');travelTab.value='trips'}});
+      });
+      diaryEntries.value.forEach(d=>{
+        if(d.title.toLowerCase().includes(q)||d.content.toLowerCase().includes(q))
+          results.push({id:'d'+d.id,module:'日记',title:d.title,action:()=>{navigate('diary');viewingDiary.value=d}});
+      });
+      return results.slice(0,10);
+    });
+
+    const storageUsed=computed(()=>{
+      const raw=localStorage.getItem(STORAGE_KEY)||'';
+      const kb=(raw.length/1024).toFixed(1);
+      return kb+'KB / ~5MB';
+    });
+
+    // --- METHODS ---
+    function navigate(v){currentView.value=v}
+    function setTheme(name){theme.value=name;document.documentElement.setAttribute('data-theme',name);persist()}
+    function applyCustomColor(c){customColor.value=c;document.documentElement.style.setProperty('--primary',c);document.documentElement.style.setProperty('--primary-bg',c+'1f')}
+    function formatDate(d){if(!d)return'';const[date]=d.split('T');const[yy,mm,dd]=date.split('-');return `${yy}-${mm}-${dd}`}
+    function formatTime(d){if(!d)return'';const parts=d.split('T');if(parts[1])return parts[1].slice(0,5);return''}
+    function getCategoryIcon(c){const m={'上装':'👕','下装':'👖','外套':'🧥','鞋':'👟','配饰':'🧢','内衣':'🩲','运动装':'🏃','正装':'🤵'};return m[c]||'👔'}
+    function getClotheName(id){const c=wardrobe.value.find(w=>w.id===id);return c?c.name:'未知'}
+
+    function changeMonth(delta){
+      calMonth.value+=delta;
+      if(calMonth.value>11){calMonth.value=0;calYear.value++}
+      if(calMonth.value<0){calMonth.value=11;calYear.value--}
+    }
+    function selectDate(date){selectedDate.value=date}
+
+    // Fitness
+    function openFitnessModal(date){
+      const existing=fitnessLogs.value.find(f=>f.date===date);
+      if(existing){
+        fitnessForm.value=JSON.parse(JSON.stringify(existing));
+      } else {
+        fitnessForm.value={date:date,weight:'',workouts:[{type:'力量训练',content:'',duration:'',notes:''}]};
+      }
+      showFitnessModal.value=true;
+    }
+    function addWorkout(){fitnessForm.value.workouts.push({type:'力量训练',content:'',duration:'',notes:''})}
+    function saveFitness(){
+      const f=fitnessForm.value;
+      const idx=fitnessLogs.value.findIndex(x=>x.date===f.date);
+      const data={date:f.date,weight:f.weight,workouts:f.workouts.filter(w=>w.content)};
+      if(idx>=0) fitnessLogs.value[idx]=data; else fitnessLogs.value.push(data);
+      showFitnessModal.value=false;
+      persist();
+    }
+    function deleteFitness(date){
+      if(!confirm('确定删除这天的记录？'))return;
+      fitnessLogs.value=fitnessLogs.value.filter(f=>f.date!==date);
+      persist();
+    }
+
+    // Wardrobe
+    function openClotheModal(clothe){
+      if(clothe){clotheForm.value=JSON.parse(JSON.stringify(clothe))}
+      else{clotheForm.value={id:null,name:'',category:'上装',brand:'',size:'',color:'',season:'',image:'',notes:''}}
+      showClotheModal.value=true;
+    }
+    async function handleClotheImage(e){
+      const file=e.target.files[0];if(!file)return;
+      clotheForm.value.image=await compressImage(file,400,0.7);
+    }
+    function saveClothe(){
+      const c=clotheForm.value;
+      if(!c.name){alert('请输入名称');return}
+      if(c.id){
+        const idx=wardrobe.value.findIndex(w=>w.id===c.id);
+        if(idx>=0) wardrobe.value[idx]={...wardrobe.value[idx],...c};
+      } else {
+        wardrobe.value.push({...c,id:genId(),wearCount:0,addedDate:today});
+      }
+      showClotheModal.value=false;
+      persist();
+    }
+    function toggleOutfitItem(c){
+      if(!outfitHistory.value[today]) outfitHistory.value[today]=[];
+      const arr=outfitHistory.value[today];
+      const idx=arr.indexOf(c.id);
+      if(idx>=0) arr.splice(idx,1);
+      else {arr.push(c.id);c.wearCount=(c.wearCount||0)+1}
+      persist();
+    }
+    function removeFromOutfit(id){
+      if(outfitHistory.value[today]){
+        outfitHistory.value[today]=outfitHistory.value[today].filter(i=>i!==id);
+        const c=wardrobe.value.find(w=>w.id===id);
+        if(c) c.wearCount=Math.max(0,(c.wearCount||1)-1);
+        persist();
+      }
+    }
+    function clearTodayOutfit(){
+      if(!todayOutfit.value)return;
+      todayOutfit.value.forEach(id=>{const c=wardrobe.value.find(w=>w.id===id);if(c)c.wearCount=Math.max(0,(c.wearCount||1)-1)});
+      delete outfitHistory.value[today];
+      persist();
+    }
+
+    // Travel
+    function openTripModal(trip){
+      if(trip){tripForm.value=JSON.parse(JSON.stringify(trip))}
+      else{tripForm.value={id:null,destination:'',startDate:'',endDate:'',budget:'',notes:'',itinerary:[],photos:[]}}
+      showTripModal.value=true;
+    }
+    function addItineraryDay(){tripForm.value.itinerary.push({date:'',activities:'',hotel:'',food:''})}
+    async function handleTripImages(e){
+      for(const file of e.target.files){
+        tripForm.value.photos.push(await compressImage(file,600,0.7));
+      }
+    }
+    function saveTrip(){
+      const t=tripForm.value;
+      if(!t.destination){alert('请输入目的地');return}
+      if(t.id){
+        const idx=trips.value.findIndex(x=>x.id===t.id);
+        if(idx>=0) trips.value[idx]={...trips.value[idx],...t};
+      } else {
+        trips.value.push({...t,id:genId()});
+      }
+      showTripModal.value=false;
+      persist();
+    }
+    function deleteTrip(id){if(!confirm('确定删除？'))return;trips.value=trips.value.filter(t=>t.id!==id);persist()}
+    function openWishModal(){wishForm.value={id:null,name:'',icon:'📍',note:''};showWishModal.value=true}
+    function saveWish(){
+      if(!wishForm.value.name){alert('请输入地点');return}
+      if(wishForm.value.id){
+        const idx=wishlist.value.findIndex(w=>w.id===wishForm.value.id);
+        if(idx>=0) wishlist.value[idx]={...wishlist.value[idx],...wishForm.value};
+      } else {
+        wishlist.value.push({...wishForm.value,id:genId()});
+      }
+      showWishModal.value=false;
+      persist();
+    }
+    function deleteWish(id){wishlist.value=wishlist.value.filter(w=>w.id!==id);persist()}
+    function promoteToTrip(w){
+      tripForm.value={id:null,destination:w.name,startDate:'',endDate:'',budget:'',notes:w.note||'',itinerary:[],photos:[]};
+      travelTab.value='trips';
+      showTripModal.value=true;
+    }
+
+    // Diary
+    function unlockDiary(){
+      if(diaryPwInput.value===diaryPassword.value){diaryUnlocked.value=true;diaryPwError.value=false;diaryPwInput.value=''}
+      else diaryPwError.value=true;
+    }
+    function openDiaryModal(d){
+      if(d){diaryForm.value=JSON.parse(JSON.stringify(d))}
+      else{diaryForm.value={id:null,date:today,title:'',content:'',weather:'☀️',tags:[],photos:[]}}
+      showDiaryModal.value=true;
+    }
+    async function handleDiaryImages(e){
+      for(const file of e.target.files){
+        diaryForm.value.photos.push(await compressImage(file,600,0.7));
+      }
+    }
+    function toggleDiaryTag(t){
+      const idx=diaryForm.value.tags.indexOf(t);
+      if(idx>=0) diaryForm.value.tags.splice(idx,1);
+      else diaryForm.value.tags.push(t);
+    }
+    function addCustomDiaryTag(){
+      const t=newDiaryTag.value.trim();
+      if(t&&!diaryForm.value.tags.includes(t)){diaryForm.value.tags.push(t)}
+      newDiaryTag.value='';
+    }
+    function saveDiary(){
+      const d=diaryForm.value;
+      if(!d.title||!d.content){alert('请填写标题和内容');return}
+      if(d.id){
+        const idx=diaryEntries.value.findIndex(x=>x.id===d.id);
+        if(idx>=0) diaryEntries.value[idx]={...diaryEntries.value[idx],...d};
+      } else {
+        diaryEntries.value.push({...d,id:genId()});
+      }
+      showDiaryModal.value=false;
+      persist();
+    }
+    function deleteDiary(id){if(!confirm('确定删除这篇日记？'))return;diaryEntries.value=diaryEntries.value.filter(d=>d.id!==id);showDiaryModal.value=false;persist()}
+    function viewDiary(d){viewingDiary.value=d}
+
+    function changeDiaryPw(){
+      if(!newPw.value){alert('请输入新密码');return}
+      diaryPassword.value=newPw.value;
+      newPw.value='';
+      persist();
+      alert('密码已修改');
+    }
+    const newPw=ref('');
+
+    // Charts
+    function drawWeightChart(canvasEl){
+      nextTick(()=>{
+        const canvas=canvasEl && canvasEl.value ? canvasEl.value : canvasEl;
+        if(!canvas||!canvas.getContext)return;
+        const ctx=canvas.getContext('2d');
+        const rect=canvas.parentElement.getBoundingClientRect();
+        canvas.width=rect.width*2;canvas.height=rect.height*2;
+        canvas.style.width=rect.width+'px';canvas.style.height=rect.height+'px';
+        ctx.scale(2,2);
+        const w=rect.width,h=rect.height;
+        const data=fitnessLogs.value.filter(f=>f.weight).sort((a,b)=>a.date.localeCompare(b.date)).slice(-30);
+        if(data.length<2){
+          ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--text3');
+          ctx.font='13px sans-serif';ctx.textAlign='center';
+          ctx.fillText('至少2条体重记录才能显示趋势',w/2,h/2);
+          return;
+        }
+        const vals=data.map(d=>parseFloat(d.weight));
+        const min=Math.min(...vals)-2,max=Math.max(...vals)+2;
+        const pad={t:20,r:15,b:30,l:40};
+        const cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+        // Grid
+        ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--border');
+        ctx.lineWidth=0.5;
+        for(let i=0;i<=4;i++){
+          const y=pad.t+ch*i/4;
+          ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
+          ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--text3');
+          ctx.font='10px sans-serif';ctx.textAlign='right';
+          ctx.fillText((max-(max-min)*i/4).toFixed(1),pad.l-5,y+3);
+        }
+        // Line
+        ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent');
+        ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath();
+        data.forEach((d,i)=>{
+          const x=pad.l+cw*i/(data.length-1);
+          const y=pad.t+ch*(1-(parseFloat(d.weight)-min)/(max-min));
+          if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+        });
+        ctx.stroke();
+        // Dots
+        data.forEach((d,i)=>{
+          const x=pad.l+cw*i/(data.length-1);
+          const y=pad.t+ch*(1-(parseFloat(d.weight)-min)/(max-min));
+          ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent');
+          ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();
+        });
+        // X labels
+        ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--text3');
+        ctx.font='9px sans-serif';ctx.textAlign='center';
+        const step=Math.max(1,Math.floor(data.length/6));
+        data.forEach((d,i)=>{
+          if(i%step===0||i===data.length-1){
+            const x=pad.l+cw*i/(data.length-1);
+            ctx.fillText(d.date.slice(5),x,h-5);
+          }
+        });
+      });
+    }
+
+    // Search
+    function goToResult(r){r.action();searchQuery.value='';showSearch.value=false}
+
+    // Storage
+    function persist(){
+      saveData({
+        fitnessLogs:toRaw(fitnessLogs.value),
+        wardrobe:toRaw(wardrobe.value),
+        outfitHistory:toRaw(outfitHistory.value),
+        trips:toRaw(trips.value),
+        wishlist:toRaw(wishlist.value),
+        diaryEntries:toRaw(diaryEntries.value),
+        diaryPassword:toRaw(diaryPassword.value),
+        theme:theme.value,
+        customColor:customColor.value,
+      });
+    }
+    function exportData(){
+      const data=JSON.stringify({
+        fitnessLogs:toRaw(fitnessLogs.value),wardrobe:toRaw(wardrobe.value),
+        outfitHistory:toRaw(outfitHistory.value),trips:toRaw(trips.value),
+        wishlist:toRaw(wishlist.value),diaryEntries:toRaw(diaryEntries.value),
+        diaryPassword:toRaw(diaryPassword.value),theme:theme.value,customColor:customColor.value,
+        exportDate:new Date().toISOString()
+      },null,2);
+      const blob=new Blob([data],{type:'application/json'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+      a.download=`lifeos-backup-${today}.json`;a.click();
+    }
+    function importData(e){
+      const file=e.target.files[0];if(!file)return;
+      const reader=new FileReader();
+      reader.onload=(ev)=>{
+        try{
+          const data=JSON.parse(ev.target.result);
+          if(data.fitnessLogs)fitnessLogs.value=data.fitnessLogs;
+          if(data.wardrobe)wardrobe.value=data.wardrobe;
+          if(data.outfitHistory)outfitHistory.value=data.outfitHistory;
+          if(data.trips)trips.value=data.trips;
+          if(data.wishlist)wishlist.value=data.wishlist;
+          if(data.diaryEntries)diaryEntries.value=data.diaryEntries;
+          if(data.diaryPassword)diaryPassword.value=data.diaryPassword;
+          if(data.theme)setTheme(data.theme);
+          if(data.customColor)applyCustomColor(data.customColor);
+          persist();alert('导入成功！');
+        }catch(err){alert('导入失败: 文件格式错误')}
+      };
+      reader.readAsText(file);
+    }
+
+    // Image full view
+    function openImageFull(src){fullImage.value=src}
+
+    // --- INIT ---
+    onMounted(()=>{
+      const data=loadData();
+      if(data){
+        fitnessLogs.value=data.fitnessLogs||[];
+        wardrobe.value=data.wardrobe||[];
+        outfitHistory.value=data.outfitHistory||{};
+        trips.value=data.trips||[];
+        wishlist.value=data.wishlist||[];
+        diaryEntries.value=data.diaryEntries||[];
+        diaryPassword.value=data.diaryPassword||DEFAULT_PW;
+        if(data.theme)setTheme(data.theme);
+        if(data.customColor)applyCustomColor(data.customColor);
+      }
+    });
+
+    // Refs for charts
+    const weightChart=ref(null);
+    const fitnessWeightChart=ref(null);
+
+    function redrawCharts(){
+      setTimeout(()=>{
+        if(currentView.value==='dashboard' && weightChart.value) drawWeightChart(weightChart);
+        if(currentView.value==='fitness' && fitnessWeightChart.value) drawWeightChart(fitnessWeightChart);
+      },250);
+    }
+    watch(currentView, redrawCharts);
+    watch(()=>fitnessLogs.value.length, redrawCharts);
+
+    // setTimeout for search
+    function setTimeout2(fn,ms){return setTimeout(fn,ms)}
+
+    return {
+      currentView,theme,themes,today,searchQuery,showSearch,
+      greeting,weekDay,
+      fitnessLogs,wardrobe,outfitHistory,trips,wishlist,diaryEntries,
+      calYear,calMonth,selectedDate,weekdays,calendarDays,
+      showFitnessModal,showClotheModal,showTripModal,showWishModal,showDiaryModal,showOutfitHistory,
+      viewingDiary,fullImage,
+      fitnessForm,clotheForm,tripForm,wishForm,diaryForm,
+      clotheFilter,clotheCategories,
+      diaryUnlocked,diaryPwInput,diaryPwError,diaryTagFilter,newDiaryTag,diaryPresets,weatherOptions,wishIcons,
+      travelTab,
+      todayFitness,todayOutfit,todayOutfitItems,recentDiary,selectedFitness,
+      filteredClothes,sortedOutfitHistory,allDiaryTags,filteredDiary,searchResults,storageUsed,
+      navigate,setTheme,customColor,applyCustomColor,formatDate,formatTime,getCategoryIcon,getClotheName,
+      changeMonth,selectDate,
+      openFitnessModal,addWorkout,saveFitness,deleteFitness,
+      openClotheModal,handleClotheImage,saveClothe,toggleOutfitItem,removeFromOutfit,clearTodayOutfit,
+      openTripModal,addItineraryDay,handleTripImages,saveTrip,deleteTrip,
+      openWishModal,saveWish,deleteWish,promoteToTrip,
+      unlockDiary,openDiaryModal,handleDiaryImages,toggleDiaryTag,addCustomDiaryTag,saveDiary,deleteDiary,viewDiary,
+      newPw,changeDiaryPw,
+      weightChart,fitnessWeightChart,
+      goToResult,exportData,importData,openImageFull,
+      setTimeout:setTimeout2,
+    };
+  }
+});
+app.mount('#app');
+</script>
+</body>
+</html>
