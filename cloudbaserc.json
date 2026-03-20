@@ -1,0 +1,17 @@
+{
+  "envId": "lyh-life-3gaebvhg40d9b9e8",
+  "functionRoot": "functions",
+  "framework": {
+    "name": "native",
+    "plugins": {
+      "website": {
+        "use": "@cloudbase/framework-plugin-website",
+        "inputs": {
+          "buildCommand": "",
+          "outputPath": ".",
+          "cloudPath": "/"
+        }
+      }
+    }
+  }
+}
