@@ -16,5 +16,3 @@ jobs:
           secretId: ${{ secrets.TENCENTCLOUD_SECRETID }}
           secretKey: ${{ secrets.TENCENTCLOUD_SECRETKEY }}
           envId: lyh-life-3gaebvhg40d9b9e8
-          staticSrcPath: ./
-          cloudPath: /
