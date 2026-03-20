@@ -18,8 +18,10 @@ jobs:
       - name: Install CloudBase CLI
         run: npm install -g @cloudbase/cli
 
-      - name: Deploy to CloudBase
+      - name: Login and Deploy
         env:
           TENCENTCLOUD_SECRETID: ${{ secrets.TENCENTCLOUD_SECRETID }}
           TENCENTCLOUD_SECRETKEY: ${{ secrets.TENCENTCLOUD_SECRETKEY }}
-        run: tcb hosting deploy -e lyh-life-3gaebvhg40d9b9e8 -r / .
+        run: |
+          tcb login --secretId $TENCENTCLOUD_SECRETID --secretKey $TENCENTCLOUD_SECRETKEY
+          tcb hosting deploy -e lyh-life-3gaebvhg40d9b9e8 -r ap-guangzhou . /
