@@ -10,19 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Deploy to CloudBase
+        uses: TencentCloudBase/cloudbase-action@v2
         with:
-          node-version: '18'
-
-      - name: Install CloudBase CLI
-        run: npm install -g @cloudbase/cli
-
-      - name: Login
-        env:
-          TENCENTCLOUD_SECRETID: ${{ secrets.TENCENTCLOUD_SECRETID }}
-          TENCENTCLOUD_SECRETKEY: ${{ secrets.TENCENTCLOUD_SECRETKEY }}
-        run: tcb login -k --apiKeyId $TENCENTCLOUD_SECRETID --apiKey $TENCENTCLOUD_SECRETKEY
-
-      - name: Deploy
-        run: tcb hosting deploy -e lyh-life-3gaebvhg40d9b9e8 -r ap-guangzhou . /
+          secretId: ${{ secrets.TENCENTCLOUD_SECRETID }}
+          secretKey: ${{ secrets.TENCENTCLOUD_SECRETKEY }}
+          envId: lyh-life-3gaebvhg40d9b9e8
+          staticSrcPath: ./
+          cloudPath: /
