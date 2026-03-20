@@ -1003,12 +1003,38 @@ body{background:var(--bg);color:var(--text);display:flex;height:100vh}
   </div>
 </div>
 
+<script src="https://static.cloud.tencent.com/tcb/tcb-js-sdk/1.3.5/tcb-js-sdk.js"></script>
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script>
 const {createApp,ref,computed,watch,onMounted,nextTick,reactive,toRaw} = Vue;
 
 const STORAGE_KEY = 'lifeos_data';
 const DEFAULT_PW = '1234';
+const CLOUDBASE_ENV = 'lyh-life-3gaebvhg40d9b9e8';
+let db = null;
+
+function initCloudBase(){
+  try{
+    const app = tcb.init({env: CLOUDBASE_ENV});
+    db = app.database();
+  }catch(e){console.warn('CloudBase init failed:', e)}
+}
+
+async function loadFromCloud(){
+  if(!db) return null;
+  try{
+    const res = await db.collection('lifeos_data').doc('main').get();
+    if(res.data && res.data.length > 0) return res.data[0].data;
+    return null;
+  }catch(e){return null}
+}
+
+async function saveToCloud(data){
+  if(!db) return;
+  try{
+    await db.collection('lifeos_data').doc('main').set({data, updatedAt: new Date().toISOString()});
+  }catch(e){console.warn('CloudBase save failed:', e)}
+}
 
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
 function todayStr(){const d=new Date();return d.toISOString().split('T')[0]}
@@ -1456,7 +1482,7 @@ const app=createApp({
 
     // Storage
     function persist(){
-      saveData({
+      const dataObj={
         fitnessLogs:toRaw(fitnessLogs.value),
         wardrobe:toRaw(wardrobe.value),
         outfitHistory:toRaw(outfitHistory.value),
@@ -1466,7 +1492,9 @@ const app=createApp({
         diaryPassword:toRaw(diaryPassword.value),
         theme:theme.value,
         customColor:customColor.value,
-      });
+      };
+      saveData(dataObj);
+      saveToCloud(dataObj);
     }
     function exportData(){
       const data=JSON.stringify({
@@ -1505,8 +1533,10 @@ const app=createApp({
     function openImageFull(src){fullImage.value=src}
 
     // --- INIT ---
-    onMounted(()=>{
-      const data=loadData();
+    onMounted(async()=>{
+      initCloudBase();
+      // Load from localStorage first (instant)
+      let data=loadData();
       if(data){
         fitnessLogs.value=data.fitnessLogs||[];
         wardrobe.value=data.wardrobe||[];
@@ -1517,6 +1547,21 @@ const app=createApp({
         diaryPassword.value=data.diaryPassword||DEFAULT_PW;
         if(data.theme)setTheme(data.theme);
         if(data.customColor)applyCustomColor(data.customColor);
+      }
+      // Then try to load from cloud (may be newer)
+      const cloudData = await loadFromCloud();
+      if(cloudData){
+        fitnessLogs.value=cloudData.fitnessLogs||[];
+        wardrobe.value=cloudData.wardrobe||[];
+        outfitHistory.value=cloudData.outfitHistory||{};
+        trips.value=cloudData.trips||[];
+        wishlist.value=cloudData.wishlist||[];
+        diaryEntries.value=cloudData.diaryEntries||[];
+        diaryPassword.value=cloudData.diaryPassword||DEFAULT_PW;
+        if(cloudData.theme)setTheme(cloudData.theme);
+        if(cloudData.customColor)applyCustomColor(cloudData.customColor);
+        // Also update localStorage
+        saveData(cloudData);
       }
     });
 
